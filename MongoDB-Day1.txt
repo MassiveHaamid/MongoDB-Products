@@ -62,13 +62,20 @@ query: db.products.find({
 -------------------------------------------------------------------------------------------------------------------
 Delete the products which product price value are same
 
-query: db.products.deleteMany({
-  "product_price": {
-    $in: db.products.aggregate([
-      { $group: { _id: "$product_price", count: { $sum: 1 } } },
-      { $match: { count: { $gt: 1 } } }
-    ]).toArray().map(doc => doc._id)
+query: db.products.aggregate([
+  {
+    $group: {
+      _id: "$product_price",
+      dproducts: { $push: "$_id" },
+      count: { $sum: 1 }
+    }
+  },
+  {
+    $match: {
+      count: { $eq: 1 }
+    }
   }
-})
+]).toArray().length
+
 
 -------------------------------------------------------------------------------------------------------------------
